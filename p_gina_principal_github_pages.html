@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101c2e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ComprasPro">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>ComprasPro</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+
+<script>
+window.addEventListener('load', function () {
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('./sw.js').catch(function () {});
+  }
+}, { once: true });
+</script>
+
+<style>
+:root{
+  --bg:#eceff3;
+  --sf:#fff;
+  --ink:#101c2e;
+  --mut:#5d6b7e;
+  --ln:#d9dee6;
+  --pri:#0b3d91;
+  --ok:#16794a;
+  --bad:#c0262d;
+  --r:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  font-size:16px;
+  padding:env(safe-area-inset-top) 0 0;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+#app{max-width:560px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:var(--ink);
+  color:#fff;
+  padding:10px 14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+header h1{font-size:20px;margin:0;font-weight:800;letter-spacing:-.02em;flex:1}
+header small{display:block;font-weight:400;font-size:12px;opacity:.75;margin-top:-2px}
+.hbtns{display:flex;gap:6px;align-items:center}
+.aibtn,.wbtn,.rbtn{
+  border:0;
+  border-radius:99px;
+  color:#fff;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.aibtn{background:var(--pri);padding:7px 12px}
+.wbtn{background:#1f9d62;padding:7px 12px}
+.rbtn{background:rgba(255,255,255,.16);padding:7px 10px;line-height:1}
+.rbtn:active{background:rgba(255,255,255,.28)}
+
+main{flex:1;padding:14px 14px 104px}
+.card{
+  background:var(--sf);
+  border-radius:var(--r);
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 1px 2px #0001;
+}
+h2{font-size:18px;margin:0 0 10px;font-weight:800;letter-spacing:-.01em}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+input,select,textarea{
+  width:100%;
+  padding:11px 12px;
+  border:1.5px solid var(--ln);
+  border-radius:11px;
+  background:#fff;
+  font-size:16px;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pri)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+.btn{
+  width:100%;
+  padding:13px;
+  border:0;
+  border-radius:12px;
+  background:var(--pri);
+  color:#fff;
+  font-weight:600;
+  font-size:16px;
+  margin-top:12px;
+  cursor:pointer;
+}
+.btn.ok{background:var(--ok)}
+.btn.bad{background:var(--bad)}
+.btn.ghost{background:#eef2f7;color:var(--ink)}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpi .card{margin:0;padding:12px}
+.kpi small{color:var(--mut);font-size:12px;display:block}
+.kpi b{font-size:19px;font-weight:800}
+
+.item{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  padding:11px 0;
+  border-bottom:1px solid var(--ln);
+  gap:10px;
+}
+.item:last-child{border:0}
+.item b{display:block;font-size:15px}
+.item small{color:var(--mut);font-size:12.5px;display:block;margin-top:2px;line-height:1.35}
+.pill{
+  font-size:11px;
+  padding:3px 8px;
+  border-radius:99px;
+  background:#eef2f7;
+  color:var(--ink);
+  font-weight:600;
+  display:inline-block;
+  margin-top:4px;
+}
+.lk{
+  border:0;
+  background:none;
+  color:var(--pri);
+  font-size:13px;
+  font-weight:600;
+  padding:4px 0;
+  cursor:pointer;
+}
+.lk.bad{color:var(--bad)}
+
+nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  z-index:20;
+  background:var(--sf);
+  border-top:1px solid var(--ln);
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+}
+nav>div{
+  max-width:560px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+}
+nav button{
+  border:0;
+  background:none;
+  padding:6px 1px;
+  color:var(--mut);
+  font-size:10.5px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  cursor:pointer;
+}
+nav button.on{color:var(--pri);font-weight:700}
+
+.bar-wrap{height:7px;background:#e5eaf2;border-radius:99px;overflow:hidden;margin-top:6px}
+.bar-fill{height:100%;background:var(--pri);border-radius:99px;transition:width .25s ease}
+.bar-fill.ok{background:var(--ok)}
+.bar-fill.bad{background:var(--bad)}
+.modal-bg{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  background:rgba(16,28,46,.55);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  padding:12px;
+}
+.modal-bg.open{display:flex}
+.modal-box{
+  background:var(--sf);
+  width:100%;
+  max-width:540px;
+  max-height:88vh;
+  overflow-y:auto;
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 12px 30px rgba(0,0,0,.25);
+}
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:84px;
+  transform:translateX(-50%);
+  background:var(--ink);
+  color:#fff;
+  padding:9px 16px;
+  border-radius:99px;
+  font-size:13px;
+  font-weight:600;
+  z-index:60;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s;
+}
+.toast.show{opacity:1}
+.chat-box{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow-y:auto;padding:4px 0}
+.msg{padding:10px 12px;border-radius:13px;font-size:14px;line-height:1.45;white-space:pre-wrap}
+.msg.user{background:var(--pri);color:#fff;align-self:flex-end;max-width:85%}
+.msg.ai{background:#eef2f7;color:var(--ink);align-self:flex-start;max-width:92%}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{border:1px solid var(--ln);background:#f8fafc;color:var(--ink);border-radius:99px;padding:6px 10px;font-size:12px;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modalBg" class="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div id="modalBox" class="modal-box"></div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const STORAGE_KEY = 'compraspro_v4';
+const VALID_TABS = ['lancamento', 'pecas', 'compras', 'gastos', 'relatorios', 'ia'];
+const NAV_ITEMS = [
+  ['lancamento', 'lançar', '➕'],
+  ['pecas', 'peças', '🏷️'],
+  ['compras', 'compras', '🛍️'],
+  ['gastos', 'gastos', '🧾'],
+  ['relatorios', 'relatórios', '📊'],
+  ['ia', 'ia', '✨']
+];
+
+const $ = id => document.getElementById(id);
+const _brlFmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const _capCache = new Map();
+
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function fmtDateBR(iso) {
+  if (!iso) return '';
+  const p = String(iso).split('-');
+  return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : iso;
+}
+
+function capFirst(str) {
+  const raw = String(str || '').trim();
+  if (!raw) return '';
+  const cached = _capCache.get(raw);
+  if (cached !== undefined) return cached;
+  const res = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+  if (_capCache.size > 1024) _capCache.clear();
+  _capCache.set(raw, res);
+  return res;
+}
+
+function esc(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function brl(val) {
+  return _brlFmt.format(Number(val) || 0);
+}
+
+function fmtMoneyInputVal(val) {
+  return (Number(val) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function parseMoney(str) {
+  if (typeof str === 'number') return Number.isFinite(str) ? str : 0;
+  const clean = String(str || '').replace(/[^\d,-]/g, '').replace(/\./g, '').replace(',', '.');
+  const n = parseFloat(clean);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function maskCurrencyInput(el) {
+  const digits = String(el.value || '').replace(/\D/g, '');
+  if (!digits) {
+    el.value = '0,00';
+    return;
+  }
+  const cents = parseInt(digits, 10) / 100;
+  el.value = cents.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function toast(msg) {
+  const t = $('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function openModal(html) {
+  $('modalBox').innerHTML = html;
+  $('modalBg').classList.add('open');
+}
+
+function closeModal() {
+  $('modalBg').classList.remove('open');
+  $('modalBox').innerHTML = '';
+}
+
+function copyTextFallback(txt) {
+  const ta = document.createElement('textarea');
+  ta.value = txt;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+}
+
+const _idx = {
+  dirty: true,
+  allMetrics: null,
+  totalExpenses: 0,
+  supplierGroups: new Map(),
+  supplierInfo: new Map(),
+  productList: [],
+  expenseCategoryTotals: [],
+  searchable: []
+};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return {
+      tab: parsed && VALID_TABS.includes(parsed.tab) ? parsed.tab : 'lancamento',
+      purchases: Array.isArray(parsed && parsed.purchases) ? parsed.purchases : [],
+      expenses: Array.isArray(parsed && parsed.expenses) ? parsed.expenses : [],
+      draft: (parsed && parsed.draft && typeof parsed.draft === 'object')
+        ? parsed.draft
+        : { date: todayISO(), supplier: '', contact: '', brand: '' },
+      editingId: null,
+      editingExpenseId: null,
+      searchCompras: (parsed && typeof parsed.searchCompras === 'string') ? parsed.searchCompras : '',
+      aiMessages: Array.isArray(parsed && parsed.aiMessages) ? parsed.aiMessages : []
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+const S = loadState() || {
+  tab: 'lancamento',
+  purchases: [],
+  expenses: [],
+  draft: { date: todayISO(), supplier: '', contact: '', brand: '' },
+  editingId: null,
+  editingExpenseId: null,
+  searchCompras: '',
+  aiMessages: []
+};
+
+let _persistTimer = null;
+
+function invalidateIndexes() {
+  _idx.dirty = true;
+}
+
+function persist(immediate = false) {
+  const writeNow = () => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        tab: S.tab,
+        purchases: S.purchases,
+        expenses: S.expenses,
+        draft: S.draft,
+        searchCompras: S.searchCompras,
+        aiMessages: S.aiMessages.slice(-30)
+      }));
+    } catch (e) {}
+  };
+  if (immediate) {
+    clearTimeout(_persistTimer);
+    writeNow();
+    return;
+  }
+  clearTimeout(_persistTimer);
+  _persistTimer = setTimeout(writeNow, 120);
+}
+
+window.addEventListener('pagehide', () => persist(true));
+
+function calcMetrics(list) {
+  let totalQty = 0;
+  let totalBuy = 0;
+  let totalSell = 0;
+  for (let i = 0; i < list.length; i++) {
+    const p = list[i];
+    const q = Number(p.qty) || 0;
+    const b = Number(p.buyPrice) || 0;
+    const s = Number(p.sellPrice) || 0;
+    totalQty += q;
+    totalBuy += q * b;
+    totalSell += q * s;
+  }
+  const profit = totalSell - totalBuy;
+  const margin = totalSell > 0 ? (profit / totalSell) * 100 : 0;
+  const avgBuy = totalQty > 0 ? totalBuy / totalQty : 0;
+  const avgSell = totalQty > 0 ? totalSell / totalQty : 0;
+  return { totalQty, totalBuy, totalSell, profit, margin, avgBuy, avgSell };
+}
+
+function ensureIndexes() {
+  if (!_idx.dirty) return;
+  _idx.allMetrics = calcMetrics(S.purchases);
+
+  let expSum = 0;
+  const expCatMap = new Map();
+  for (let i = 0; i < S.expenses.length; i++) {
+    const ex = S.expenses[i];
+    const amt = Number(ex.amount) || 0;
+    expSum += amt;
+    const cat = ex.category || 'outros';
+    expCatMap.set(cat, (expCatMap.get(cat) || 0) + amt);
+  }
+  _idx.totalExpenses = expSum;
+  _idx.expenseCategoryTotals = Array.from(expCatMap.entries()).sort((a, b) => b[1] - a[1]);
+
+  const groups = new Map();
+  const prodMap = new Map();
+  const searchable = [];
+
+  for (let i = 0; i < S.purchases.length; i++) {
+    const p = S.purchases[i];
+    const sup = capFirst(p.supplier || 'Sem fornecedor');
+    if (!groups.has(sup)) groups.set(sup, []);
+    groups.get(sup).push(p);
+
+    const name = String(p.product || 'Sem nome').trim();
+    const key = name.toLowerCase();
+    if (!prodMap.has(key)) {
+      prodMap.set(key, { name, qty: 0, buy: 0, sell: 0, suppliers: new Set() });
+    }
+    const row = prodMap.get(key);
+    const q = Number(p.qty) || 0;
+    row.qty += q;
+    row.buy += q * (Number(p.buyPrice) || 0);
+    row.sell += q * (Number(p.sellPrice) || 0);
+    row.suppliers.add(sup);
+
+    searchable.push({
+      item: p,
+      haystack: `${sup} ${name} ${String(p.brand || '')} ${String(p.contact || '')} ${String(p.notes || '')}`.toLowerCase()
+    });
+  }
+
+  _idx.supplierGroups = groups;
+  _idx.supplierInfo.clear();
+  for (const [sup, items] of groups.entries()) {
+    let contact = '';
+    const brandSet = new Set();
+    for (let i = 0; i < items.length; i++) {
+      if (!contact && items[i].contact) contact = items[i].contact;
+      const b = String(items[i].brand || '').trim();
+      if (b) brandSet.add(b);
+    }
+    _idx.supplierInfo.set(sup, { supplier: sup, contact, brands: Array.from(brandSet), items });
+  }
+
+  _idx.productList = Array.from(prodMap.values()).sort((a, b) => b.qty - a.qty);
+  _idx.searchable = searchable;
+  _idx.dirty = false;
+}
+
+function getSupplierInfo(supplierName) {
+  ensureIndexes();
+  const norm = capFirst(supplierName);
+  return _idx.supplierInfo.get(norm) || { supplier: norm, contact: '', brands: [], items: [] };
+}
+
+function savePurchaseForm(e) {
+  e.preventDefault();
+  const date = $('fDate').value || todayISO();
+  const supplier = capFirst($('fSupplier').value);
+  const contact = ($('fContact').value || '').trim();
+  const brand = ($('fBrand').value || '').trim();
+  const product = ($('fProduct').value || '').trim();
+  const qty = parseInt($('fQty').value, 10) || 0;
+  const buyPrice = parseMoney($('fBuy').value);
+  const sellPrice = parseMoney($('fSell').value);
+  const notes = ($('fNotes') ? $('fNotes').value : '').trim();
+
+  if (!supplier || !product || qty <= 0) {
+    toast('preencha fornecedor, produto e quantidade');
+    return;
+  }
+
+  if (S.editingId) {
+    const idx = S.purchases.findIndex(x => x.id === S.editingId);
+    if (idx >= 0) {
+      const oldSupplier = capFirst(S.purchases[idx].supplier);
+      S.purchases[idx] = {
+        ...S.purchases[idx],
+        date,
+        supplier,
+        contact,
+        brand,
+        product,
+        qty,
+        buyPrice,
+        sellPrice,
+        notes
+      };
+      const allBrandsInput = $('fAllBrands') ? $('fAllBrands').value : '';
+      const parsedBrands = allBrandsInput.split(',').map(b => b.trim()).filter(Boolean);
+
+      for (let i = 0; i < S.purchases.length; i++) {
+        const item = S.purchases[i];
+        const itemSup = capFirst(item.supplier);
+        if (itemSup === oldSupplier || itemSup === supplier) {
+          item.supplier = supplier;
+          if (contact) item.contact = contact;
+          if (parsedBrands.length === 1 && !item.brand) item.brand = parsedBrands[0];
+        }
+      }
+    }
+    S.editingId = null;
+    invalidateIndexes();
+    persist();
+    toast('lançamento e fornecedor atualizados');
+    renderView();
+    return;
+  }
+
+  S.purchases.unshift({
+    id: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    date,
+    supplier,
+    contact,
+    brand,
+    product,
+    qty,
+    buyPrice,
+    sellPrice,
+    notes
+  });
+
+  S.draft = { date, supplier, contact, brand: '' };
+  invalidateIndexes();
+  persist();
+  toast('produto adicionado');
+  renderView();
+}
+
+function startEditPurchase(id) {
+  S.editingId = id;
+  if (S.tab !== 'lancamento') {
+    S.tab = 'lancamento';
+    persist();
+    render();
+  } else {
+    renderView();
+  }
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function cancelEditPurchase() {
+  S.editingId = null;
+  renderView();
+}
+
+function finalizeCurrentOrder() {
+  const sup = capFirst($('fSupplier') ? $('fSupplier').value : S.draft.supplier);
+  const info = sup ? getSupplierInfo(sup) : null;
+  const hasDraft = Boolean(sup || (S.draft && (S.draft.supplier || S.draft.contact)));
+
+  if (!hasDraft && (!info || !info.items.length)) {
+    toast('nenhum pedido em andamento para finalizar');
+    return;
+  }
+
+  S.draft = { date: todayISO(), supplier: '', contact: '', brand: '' };
+  S.editingId = null;
+  persist(true);
+
+  if (info && info.items.length) {
+    const gm = calcMetrics(info.items);
+    toast(`pedido de ${info.supplier} (${gm.totalQty} un. · ${brl(gm.totalBuy)}) finalizado`);
+  } else {
+    toast('pedido finalizado');
+  }
+
+  renderView();
+}
+
+function removePurchase(id) {
+  S.purchases = S.purchases.filter(x => x.id !== id);
+  if (S.editingId === id) S.editingId = null;
+  invalidateIndexes();
+  persist();
+  toast('item removido');
+  renderView();
+}
+
+function removeSupplierGroup(supplierName) {
+  const target = capFirst(supplierName);
+  S.purchases = S.purchases.filter(x => capFirst(x.supplier) !== target);
+  invalidateIndexes();
+  persist();
+  toast('fornecedor removido');
+  renderView();
+}
+
+function openEditSupplierGeneralModal(supplierName) {
+  const info = getSupplierInfo(supplierName);
+  if (!info.items.length) return;
+
+  openModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h2 style="margin:0">editar pedido geral · <strong>${esc(info.supplier)}</strong></h2>
+      <button class="lk" type="button" onclick="closeModal()">fechar</button>
+    </div>
+    <form onsubmit="saveSupplierGeneralModal(event, '${esc(info.supplier)}')">
+      <label>nome do fornecedor</label>
+      <input id="sgName" value="${esc(info.supplier)}" required>
+      <label>contato geral do fornecedor</label>
+      <input id="sgContact" value="${esc(info.contact)}" placeholder="telefone / whatsapp / box">
+      <div style="margin-top:12px;font-weight:700;font-size:14px">itens do pedido (${info.items.length})</div>
+      ${info.items.map((it, idx) => `
+        <div class="card" style="background:#f8fafc;border:1px solid var(--ln);margin-top:8px;padding:10px">
+          <input type="hidden" class="sg-id" value="${esc(it.id)}">
+          <div style="font-size:12px;color:var(--mut);font-weight:700">item ${idx + 1}</div>
+          <div class="row">
+            <div>
+              <label>marca</label>
+              <input class="sg-brand" value="${esc(it.brand || '')}">
+            </div>
+            <div>
+              <label>produto</label>
+              <input class="sg-product" value="${esc(it.product || '')}" required>
+            </div>
+          </div>
+          <div class="row3">
+            <div>
+              <label>qtd</label>
+              <input class="sg-qty" type="number" min="1" value="${esc(it.qty)}" required>
+            </div>
+            <div>
+              <label>compra (R$)</label>
+              <input class="sg-buy" inputmode="numeric" value="${fmtMoneyInputVal(it.buyPrice)}" oninput="maskCurrencyInput(this)">
+            </div>
+            <div>
+              <label>venda (R$)</label>
+              <input class="sg-sell" inputmode="numeric" value="${fmtMoneyInputVal(it.sellPrice)}" oninput="maskCurrencyInput(this)">
+            </div>
+          </div>
+        </div>
+      `).join('')}
+      <div class="row" style="margin-top:10px">
+        <button class="btn ghost" type="button" onclick="closeModal()">cancelar</button>
+        <button class="btn ok" type="submit">salvar tudo</button>
+      </div>
+    </form>
+  `);
+}
+
+function saveSupplierGeneralModal(e, oldSupplierName) {
+  e.preventDefault();
+  const newSupplier = capFirst($('sgName').value);
+  const newContact = ($('sgContact').value || '').trim();
+  if (!newSupplier) {
+    toast('informe o nome do fornecedor');
+    return;
+  }
+
+  const ids = Array.from(document.querySelectorAll('.sg-id')).map(el => el.value);
+  const brands = Array.from(document.querySelectorAll('.sg-brand')).map(el => el.value.trim());
+  const products = Array.from(document.querySelectorAll('.sg-product')).map(el => el.value.trim());
+  const qtys = Array.from(document.querySelectorAll('.sg-qty')).map(el => parseInt(el.value, 10) || 1);
+  const buys = Array.from(document.querySelectorAll('.sg-buy')).map(el => parseMoney(el.value));
+  const sells = Array.from(document.querySelectorAll('.sg-sell')).map(el => parseMoney(el.value));
+
+  const byId = new Map();
+  for (let i = 0; i < S.purchases.length; i++) byId.set(S.purchases[i].id, S.purchases[i]);
+
+  for (let idx = 0; idx < ids.length; idx++) {
+    const p = byId.get(ids[idx]);
+    if (p) {
+      p.supplier = newSupplier;
+      p.contact = newContact;
+      p.brand = brands[idx];
+      if (products[idx]) p.product = products[idx];
+      p.qty = qtys[idx];
+      p.buyPrice = buys[idx];
+      p.sellPrice = sells[idx];
+    }
+  }
+
+  if (capFirst(S.draft.supplier) === capFirst(oldSupplierName)) {
+    S.draft.supplier = newSupplier;
+    S.draft.contact = newContact;
+  }
+
+  invalidateIndexes();
+  persist();
+  closeModal();
+  toast('pedido geral atualizado');
+  renderView();
+}
+
+function saveExpenseForm(e) {
+  e.preventDefault();
+  const date = $('eDate').value || todayISO();
+  const category = $('eCat').value || 'transporte';
+  const desc = ($('eDesc').value || '').trim();
+  const amount = parseMoney($('eAmount').value);
+
+  if (!desc || amount <= 0) {
+    toast('preencha descrição e valor do gasto');
+    return;
+  }
+
+  if (S.editingExpenseId) {
+    const idx = S.expenses.findIndex(x => x.id === S.editingExpenseId);
+    if (idx >= 0) {
+      S.expenses[idx] = { ...S.expenses[idx], date, category, desc, amount };
+    }
+    S.editingExpenseId = null;
+    invalidateIndexes();
+    persist();
+    toast('gasto atualizado');
+    renderView();
+    return;
+  }
+
+  S.expenses.unshift({
+    id: 'e_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    date,
+    category,
+    desc,
+    amount
+  });
+  invalidateIndexes();
+  persist();
+  toast('gasto registrado');
+  renderView();
+}
+
+function startEditExpense(id) {
+  S.editingExpenseId = id;
+  renderView();
+}
+
+function removeExpense(id) {
+  S.expenses = S.expenses.filter(x => x.id !== id);
+  if (S.editingExpenseId === id) S.editingExpenseId = null;
+  invalidateIndexes();
+  persist();
+  toast('gasto removido');
+  renderView();
+}
+
+function exportBackupFile() {
+  try {
+    const payload = {
+      app: 'ComprasPro',
+      version: 4,
+      exportedAt: new Date().toISOString(),
+      purchases: S.purchases,
+      expenses: S.expenses
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `compraspro_backup_${todayISO()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('backup exportado');
+  } catch (e) {
+    toast('não foi possível exportar o arquivo');
+  }
+}
+
+function triggerSingleDownload(filename, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function downloadGithubFile(type) {
+  try {
+    if (type === 'index') {
+      const fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      triggerSingleDownload('index.html', fullHtml, 'text/html;charset=utf-8');
+      toast('baixando index.html');
+      return;
+    }
+    if (type === 'manifest') {
+      const manifestContent = JSON.stringify({
+        name: 'ComprasPro',
+        short_name: 'ComprasPro',
+        description: 'Controle rápido e offline de compras, peças, gastos de viagem e relatórios.',
+        start_url: './index.html',
+        scope: './',
+        display: 'standalone',
+        orientation: 'portrait',
+        background_color: '#eceff3',
+        theme_color: '#101c2e',
+        icons: [
+          {
+            src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23101c2e'/><text x='50' y='66' font-size='54' text-anchor='middle'>🛍️</text></svg>",
+            sizes: '192x192',
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
+          },
+          {
+            src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23101c2e'/><text x='50' y='66' font-size='54' text-anchor='middle'>🛍️</text></svg>",
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
+          }
+        ]
+      }, null, 2);
+      triggerSingleDownload('manifest.json', manifestContent, 'application/manifest+json;charset=utf-8');
+      toast('baixando manifest.json');
+      return;
+    }
+    if (type === 'sw') {
+      const swContent = [
+        "const CACHE_NAME = 'compraspro-offline-v4';",
+        "const ASSETS = ['./', './index.html', './manifest.json'];",
+        "self.addEventListener('install', (e) => { self.skipWaiting(); e.waitUntil(caches.open(CACHE_NAME).then((c) => c.addAll(ASSETS)).catch(() => {})); });",
+        "self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });",
+        "self.addEventListener('fetch', (e) => { if (e.request.method !== 'GET') return; e.respondWith(caches.match(e.request).then((cached) => cached || fetch(e.request).then((resp) => { if (resp && resp.status === 200) { const copy = resp.clone(); caches.open(CACHE_NAME).then((c) => c.put(e.request, copy)).catch(() => {}); } return resp; }).catch(() => caches.match('./index.html')))); });"
+      ].join('\n');
+      triggerSingleDownload('sw.js', swContent, 'application/javascript;charset=utf-8');
+      toast('baixando sw.js');
+      return;
+    }
+    if (type === 'readme') {
+      const readmeContent = [
+        '# ComprasPro',
+        '',
+        'Aplicativo leve, rápido e instalável (PWA) para controle de compras em viagem.',
+        '',
+        '## Como publicar no GitHub Pages',
+        '1. Envie `index.html`, `manifest.json`, `sw.js` e `README.md` para a raiz do repositório.',
+        '2. Vá em Settings > Pages, selecione `main` e `/ (root)` e clique em Save.'
+      ].join('\n');
+      triggerSingleDownload('README.md', readmeContent, 'text/markdown;charset=utf-8');
+      toast('baixando README.md');
+    }
+  } catch (e) {
+    toast('erro ao gerar download');
+  }
+}
+
+function downloadAllGithubFiles() {
+  downloadGithubFile('index');
+  setTimeout(() => downloadGithubFile('manifest'), 350);
+  setTimeout(() => downloadGithubFile('sw'), 700);
+  setTimeout(() => downloadGithubFile('readme'), 1050);
+}
+
+function openGithubExportModal() {
+  openModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h2 style="margin:0">📦 arquivos para github</h2>
+      <button class="lk" type="button" onclick="closeModal()">fechar</button>
+    </div>
+    <small style="color:var(--mut);display:block;margin-bottom:10px">baixe os 4 arquivos diretamente para o seu celular ou computador e suba na raiz do seu repositório GitHub:</small>
+    <button class="btn ok" type="button" onclick="downloadAllGithubFiles()">⬇️ baixar todos os 4 arquivos</button>
+    <div class="row" style="margin-top:8px">
+      <button class="btn ghost" type="button" style="margin-top:0;padding:10px;font-size:14px" onclick="downloadGithubFile('index')">1. index.html</button>
+      <button class="btn ghost" type="button" style="margin-top:0;padding:10px;font-size:14px" onclick="downloadGithubFile('manifest')">2. manifest.json</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn ghost" type="button" style="margin-top:0;padding:10px;font-size:14px" onclick="downloadGithubFile('sw')">3. sw.js</button>
+      <button class="btn ghost" type="button" style="margin-top:0;padding:10px;font-size:14px" onclick="downloadGithubFile('readme')">4. README.md</button>
+    </div>
+  `);
+}
+
+function importBackupFile(input) {
+  const file = input && input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function () {
+    try {
+      const data = JSON.parse(String(reader.result || '{}'));
+      if (!Array.isArray(data.purchases) || !Array.isArray(data.expenses)) {
+        toast('arquivo de backup inválido');
+        return;
+      }
+      S.purchases = data.purchases;
+      S.expenses = data.expenses;
+      S.editingId = null;
+      S.editingExpenseId = null;
+      invalidateIndexes();
+      persist(true);
+      renderView();
+      toast('backup restaurado com sucesso');
+    } catch (err) {
+      toast('erro ao ler arquivo de backup');
+    } finally {
+      input.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
+
+function runPerformanceBenchmark() {
+  const t0 = performance.now();
+  invalidateIndexes();
+  ensureIndexes();
+  const indexedMs = performance.now() - t0;
+
+  const t1 = performance.now();
+  const samplePurchases = S.purchases.length ? S.purchases : Array.from({ length: 120 }, (_, i) => ({
+    id: 'bench_' + i,
+    date: todayISO(),
+    supplier: 'Fornecedor ' + (i % 10),
+    contact: '11999990000',
+    brand: 'Marca ' + (i % 6),
+    product: 'Peça ' + (i % 15),
+    qty: 10 + (i % 8),
+    buyPrice: 25 + (i % 30),
+    sellPrice: 48 + (i % 40)
+  }));
+  const directRes = calcMetrics(samplePurchases);
+  const directMs = performance.now() - t1;
+
+  const t2 = performance.now();
+  for (let i = 0; i < 50; i++) {
+    ensureIndexes();
+    void _idx.allMetrics.totalBuy;
+  }
+  const cached50Ms = performance.now() - t2;
+
+  return {
+    recordsEvaluated: samplePurchases.length,
+    directCalcMs: directMs.toFixed(2),
+    indexedBuildMs: indexedMs.toFixed(2),
+    cached50ReadsMs: cached50Ms.toFixed(2),
+    sampleTotalBuy: brl(directRes.totalBuy)
+  };
+}
+
+function openPerfModal() {
+  const b = runPerformanceBenchmark();
+  openModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h2 style="margin:0">⚡ diagnóstico de desempenho</h2>
+      <button class="lk" type="button" onclick="closeModal()">fechar</button>
+    </div>
+    <small style="color:var(--mut);display:block;margin-bottom:10px">medição real executada no navegador neste dispositivo</small>
+    <div class="item"><span>cálculo direto sem índice (${b.recordsEvaluated} itens)</span><b>${b.directCalcMs} ms</b></div>
+    <div class="item"><span>montagem de índices em memória</span><b>${b.indexedBuildMs} ms</b></div>
+    <div class="item"><span>50 leituras cacheadas consecutivas</span><b>${b.cached50ReadsMs} ms</b></div>
+    <div class="item"><span>volume auditado</span><b>${b.sampleTotalBuy}</b></div>
+    <button class="btn ghost" type="button" onclick="openPerfModal()">rodar medição novamente</button>
+  `);
+}
+
+function vLancamento() {
+  ensureIndexes();
+  const m = _idx.allMetrics;
+  const editing = S.editingId ? S.purchases.find(x => x.id === S.editingId) : null;
+  const supInfo = editing ? getSupplierInfo(editing.supplier) : null;
+
+  const formVals = editing ? {
+    date: editing.date || todayISO(),
+    supplier: capFirst(editing.supplier),
+    contact: editing.contact || '',
+    brand: editing.brand || '',
+    product: editing.product || '',
+    qty: editing.qty || 1,
+    buy: fmtMoneyInputVal(editing.buyPrice),
+    sell: fmtMoneyInputVal(editing.sellPrice),
+    notes: editing.notes || '',
+    allBrands: supInfo ? supInfo.brands.join(', ') : ''
+  } : {
+    date: S.draft.date || todayISO(),
+    supplier: capFirst(S.draft.supplier || ''),
+    contact: S.draft.contact || '',
+    brand: '',
+    product: '',
+    qty: '',
+    buy: '0,00',
+    sell: '0,00',
+    notes: '',
+    allBrands: ''
+  };
+
+  const recentLimit = Math.min(5, S.purchases.length);
+  const recentHtml = [];
+  for (let i = 0; i < recentLimit; i++) {
+    const p = S.purchases[i];
+    const sub = (Number(p.qty) || 0) * (Number(p.buyPrice) || 0);
+    recentHtml.push(`
+      <div class="item">
+        <div>
+          <b>${esc(p.product)} · <strong>${esc(capFirst(p.supplier))}</strong></b>
+          <small>${fmtDateBR(p.date)}${p.brand ? ' · ' + esc(p.brand) : ''}${p.contact ? ' · ' + esc(p.contact) : ''}</small>
+          <small>compra ${brl(p.buyPrice)} · venda ${brl(p.sellPrice)}</small>
+          ${p.notes ? `<small style="color:var(--ink)">obs: ${esc(p.notes)}</small>` : ''}
+          <div style="display:flex;gap:12px;margin-top:2px">
+            <button class="lk" type="button" onclick="startEditPurchase('${esc(p.id)}')">editar</button>
+            <button class="lk bad" type="button" onclick="removePurchase('${esc(p.id)}')">remover</button>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <b>${p.qty} un.</b>
+          <small>${brl(sub)}</small>
+        </div>
+      </div>
+    `);
+  }
+
+  $('main').innerHTML = `
+    <div class="kpi">
+      <div class="card"><small>total comprado</small><b>${brl(m.totalBuy)}</b></div>
+      <div class="card"><small>média de preço total</small><b>${brl(m.avgBuy)}</b></div>
+      <div class="card"><small>peças compradas</small><b>${m.totalQty} un.</b></div>
+      <div class="card"><small>lucro previsto</small><b style="color:var(--ok)">${brl(m.profit)}</b></div>
+    </div>
+
+    <div class="card">
+      <h2>${editing ? 'editar pedido e fornecedor' : 'novo lançamento'}</h2>
+      <form onsubmit="savePurchaseForm(event)">
+        <div class="row">
+          <div>
+            <label>data</label>
+            <input id="fDate" type="date" value="${esc(formVals.date)}" required>
+          </div>
+          <div>
+            <label>fornecedor / loja</label>
+            <input id="fSupplier" value="${esc(formVals.supplier)}" placeholder="ex: Marcos" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>contato</label>
+            <input id="fContact" value="${esc(formVals.contact)}" placeholder="telefone / box">
+          </div>
+          <div>
+            <label>marca</label>
+            <input id="fBrand" value="${esc(formVals.brand)}" placeholder="digite a marca">
+          </div>
+        </div>
+
+        ${editing ? `
+          <label>todas as marcas deste fornecedor</label>
+          <input id="fAllBrands" value="${esc(formVals.allBrands)}" placeholder="ex: Kids, U2">
+        ` : ''}
+
+        <div class="row">
+          <div>
+            <label>produto / peça</label>
+            <input id="fProduct" value="${esc(formVals.product)}" placeholder="ex: blusa" required>
+          </div>
+          <div>
+            <label>quantidade</label>
+            <input id="fQty" type="number" min="1" value="${esc(formVals.qty)}" placeholder="0" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>valor de compra (R$)</label>
+            <input id="fBuy" inputmode="numeric" value="${esc(formVals.buy)}" oninput="maskCurrencyInput(this)" onblur="maskCurrencyInput(this)" required>
+          </div>
+          <div>
+            <label>valor de venda (R$)</label>
+            <input id="fSell" inputmode="numeric" value="${esc(formVals.sell)}" oninput="maskCurrencyInput(this)" onblur="maskCurrencyInput(this)" required>
+          </div>
+        </div>
+
+        <label>observações</label>
+        <textarea id="fNotes" rows="2" placeholder="grades, cores, condições de pagamento, prazo...">${esc(formVals.notes)}</textarea>
+
+        ${editing ? `
+          <div class="row">
+            <button class="btn ghost" type="button" onclick="cancelEditPurchase()">cancelar</button>
+            <button class="btn ok" type="submit">salvar alterações</button>
+          </div>
+        ` : `
+          <button class="btn" type="submit">adicionar produto</button>
+          <button class="btn ok" type="button" onclick="finalizeCurrentOrder()">finalizar pedido</button>
+        `}
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>últimos lançamentos (${S.purchases.length})</h2>
+      ${recentHtml.length ? recentHtml.join('') : '<small style="color:var(--mut)">nenhum lançamento registrado ainda.</small>'}
+    </div>
+  `;
+}
+
+function vPecas() {
+  ensureIndexes();
+  const m = _idx.allMetrics;
+  const list = _idx.productList;
+
+  $('main').innerHTML = `
+    <div class="kpi">
+      <div class="card"><small>tipos de peças</small><b>${list.length}</b></div>
+      <div class="card"><small>total de peças</small><b>${m.totalQty} un.</b></div>
+      <div class="card"><small>média de preço total</small><b>${brl(m.avgBuy)}</b></div>
+      <div class="card"><small>total investido</small><b>${brl(m.totalBuy)}</b></div>
+    </div>
+
+    <div class="card">
+      <h2>resumo por peça</h2>
+      ${list.length ? list.map(item => {
+        const avg = item.qty > 0 ? item.buy / item.qty : 0;
+        const profit = item.sell - item.buy;
+        const margin = item.sell > 0 ? (profit / item.sell) * 100 : 0;
+        return `
+          <div class="item">
+            <div>
+              <b>${esc(item.name)}</b>
+              <small>fornecedores: <strong>${esc(Array.from(item.suppliers).join(', '))}</strong></small>
+              <small>média compra ${brl(avg)} · lucro ${brl(profit)} (${margin.toFixed(1).replace('.', ',')}%)</small>
+            </div>
+            <div style="text-align:right">
+              <b>${item.qty} un.</b>
+              <small>${brl(item.buy)}</small>
+            </div>
+          </div>
+        `;
+      }).join('') : '<small style="color:var(--mut)">nenhuma peça cadastrada.</small>'}
+    </div>
+  `;
+}
+
+function renderComprasResults() {
+  ensureIndexes();
+  const container = $('comprasResults');
+  if (!container) return;
+
+  const q = (S.searchCompras || '').trim().toLowerCase();
+  let m;
+  let groupList;
+
+  if (!q) {
+    m = _idx.allMetrics;
+    groupList = Array.from(_idx.supplierGroups.entries());
+  } else {
+    const matched = [];
+    const groups = new Map();
+    for (let i = 0; i < _idx.searchable.length; i++) {
+      const entry = _idx.searchable[i];
+      if (entry.haystack.includes(q)) {
+        const p = entry.item;
+        matched.push(p);
+        const sup = capFirst(p.supplier || 'Sem fornecedor');
+        if (!groups.has(sup)) groups.set(sup, []);
+        groups.get(sup).push(p);
+      }
+    }
+    m = calcMetrics(matched);
+    groupList = Array.from(groups.entries());
+  }
+
+  container.innerHTML = `
+    <div class="kpi">
+      <div class="card"><small>total de compras</small><b>${brl(m.totalBuy)}</b></div>
+      <div class="card"><small>média de preço total</small><b>${brl(m.avgBuy)}</b></div>
+      <div class="card"><small>lucro previsto</small><b style="color:var(--ok)">${brl(m.profit)}</b></div>
+      <div class="card"><small>margem de lucro</small><b>${m.margin.toFixed(1).replace('.', ',')}%</b></div>
+    </div>
+
+    <div class="card">
+      <h2>histórico de compras por fornecedor (${groupList.length})</h2>
+      ${groupList.length ? groupList.map(([sup, items]) => {
+        const gm = calcMetrics(items);
+        let contact = '';
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].contact) { contact = items[i].contact; break; }
+        }
+        return `
+          <div style="border:1px solid var(--ln);border-radius:12px;padding:10px;margin-bottom:10px">
+            <div style="background:#f3f6fa;border-radius:9px;padding:9px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+              <div>
+                <div style="font-size:16px"><strong>${esc(sup)}</strong></div>
+                <small style="color:var(--mut)">${contact ? 'contato: ' + esc(contact) : 'sem contato'}</small>
+              </div>
+              <div style="text-align:right">
+                <small style="color:var(--mut)">${items.length} item(ns) · ${gm.totalQty} un. · média ${brl(gm.avgBuy)}</small>
+                <div style="font-weight:800">${brl(gm.totalBuy)}</div>
+              </div>
+            </div>
+
+            ${items.map(it => {
+              const sub = (Number(it.qty) || 0) * (Number(it.buyPrice) || 0);
+              const sellSub = (Number(it.qty) || 0) * (Number(it.sellPrice) || 0);
+              const mg = sellSub > 0 ? ((sellSub - sub) / sellSub) * 100 : 0;
+              return `
+                <div class="item">
+                  <div>
+                    <b>${esc(it.product)}</b>
+                    <small>${fmtDateBR(it.date)}${it.contact ? ' · ' + esc(it.contact) : ''}${it.brand ? ' · ' + esc(it.brand) : ''}</small>
+                    <small>compra ${brl(it.buyPrice)} · venda ${brl(it.sellPrice)} · margem ${mg.toFixed(1).replace('.', ',')}%</small>
+                    ${it.notes ? `<small style="color:var(--ink)">obs: ${esc(it.notes)}</small>` : ''}
+                    <div style="display:flex;gap:12px;margin-top:2px">
+                      <button class="lk" type="button" onclick="startEditPurchase('${esc(it.id)}')">editar</button>
+                      <button class="lk bad" type="button" onclick="removePurchase('${esc(it.id)}')">remover</button>
+                    </div>
+                  </div>
+                  <div style="text-align:right">
+                    <b>${it.qty} un.</b>
+                    <small>${brl(sub)}</small>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--ln);margin-top:4px">
+              <button class="lk" type="button" onclick="openEditSupplierGeneralModal('${esc(sup)}')">editar pedido geral</button>
+              <button class="lk bad" type="button" onclick="removeSupplierGroup('${esc(sup)}')">remover fornecedor</button>
+            </div>
+          </div>
+        `;
+      }).join('') : '<small style="color:var(--mut)">nenhuma compra encontrada.</small>'}
+    </div>
+  `;
+}
+
+function onSearchComprasInput(val) {
+  S.searchCompras = val;
+  persist();
+  clearTimeout(window._searchTimer);
+  window._searchTimer = setTimeout(renderComprasResults, 60);
+}
+
+function vCompras() {
+  $('main').innerHTML = `
+    <div class="card">
+      <input
+        id="searchComprasInput"
+        value="${esc(S.searchCompras)}"
+        placeholder="buscar fornecedor, marca ou produto..."
+        oninput="onSearchComprasInput(this.value)"
+      >
+    </div>
+    <div id="comprasResults"></div>
+  `;
+  renderComprasResults();
+}
+
+function vGastos() {
+  ensureIndexes();
+  const m = _idx.allMetrics;
+  const totalExpenses = _idx.totalExpenses;
+  const custoTotal = m.totalBuy + totalExpenses;
+  const lucroReal = m.profit - totalExpenses;
+  const ed = S.editingExpenseId ? S.expenses.find(x => x.id === S.editingExpenseId) : null;
+
+  $('main').innerHTML = `
+    <div class="kpi">
+      <div class="card"><small>gastos de viagem</small><b style="color:var(--bad)">${brl(totalExpenses)}</b></div>
+      <div class="card"><small>custo geral (compras+viagem)</small><b>${brl(custoTotal)}</b></div>
+      <div class="card"><small>lucro bruto compras</small><b>${brl(m.profit)}</b></div>
+      <div class="card"><small>lucro líquido real</small><b style="color:${lucroReal >= 0 ? 'var(--ok)' : 'var(--bad)'}">${brl(lucroReal)}</b></div>
+    </div>
+
+    <div class="card">
+      <h2>${ed ? 'editar gasto de viagem' : 'registrar gasto de viagem'}</h2>
+      <form onsubmit="saveExpenseForm(event)">
+        <div class="row">
+          <div>
+            <label>data</label>
+            <input id="eDate" type="date" value="${esc(ed ? ed.date : todayISO())}" required>
+          </div>
+          <div>
+            <label>categoria</label>
+            <select id="eCat">
+              ${['transporte', 'hotel', 'alimentação', 'pedágio', 'frete', 'outros'].map(c =>
+                `<option value="${c}" ${ed && ed.category === c ? 'selected' : ''}>${c}</option>`
+              ).join('')}
+            </select>
+          </div>
+        </div>
+        <label>descrição do gasto</label>
+        <input id="eDesc" value="${esc(ed ? ed.desc : '')}" placeholder="ex: passagem ônibus, almoço, diária hotel" required>
+        <label>valor (R$)</label>
+        <input id="eAmount" inputmode="numeric" value="${ed ? fmtMoneyInputVal(ed.amount) : '0,00'}" oninput="maskCurrencyInput(this)" onblur="maskCurrencyInput(this)" required>
+        ${ed ? `
+          <div class="row">
+            <button class="btn ghost" type="button" onclick="S.editingExpenseId=null;renderView()">cancelar</button>
+            <button class="btn ok" type="submit">salvar gasto</button>
+          </div>
+        ` : `
+          <button class="btn" type="submit">adicionar gasto</button>
+        `}
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>despesas registradas (${S.expenses.length})</h2>
+      ${S.expenses.length ? S.expenses.map(ex => `
+        <div class="item">
+          <div>
+            <b>${esc(ex.desc)}</b>
+            <small>${fmtDateBR(ex.date)} · <span class="pill">${esc(ex.category)}</span></small>
+            <div style="display:flex;gap:12px;margin-top:2px">
+              <button class="lk" type="button" onclick="startEditExpense('${esc(ex.id)}')">editar</button>
+              <button class="lk bad" type="button" onclick="removeExpense('${esc(ex.id)}')">remover</button>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <b style="color:var(--bad)">${brl(ex.amount)}</b>
+          </div>
+        </div>
+      `).join('') : '<small style="color:var(--mut)">nenhum gasto de viagem registrado ainda.</small>'}
+    </div>
+  `;
+}
+
+function buildFullReportText() {
+  ensureIndexes();
+  const m = _idx.allMetrics;
+  const totalExpenses = _idx.totalExpenses;
+  const custoGeral = m.totalBuy + totalExpenses;
+  const lucroLiquido = m.profit - totalExpenses;
+  const roi = custoGeral > 0 ? (lucroLiquido / custoGeral) * 100 : 0;
+
+  const lines = [
+    '====================================',
+    'RELATÓRIO GERAL DE VIAGEM - COMPRASPRO',
+    '====================================',
+    `Data de emissão: ${fmtDateBR(todayISO())}`,
+    '',
+    '1. BALANÇO FINANCEIRO',
+    `• Total de peças compradas: ${m.totalQty} un.`,
+    `• Investimento em mercadorias: ${brl(m.totalBuy)}`,
+    `• Média de preço por peça: ${brl(m.avgBuy)}`,
+    `• Gastos de viagem: ${brl(totalExpenses)}`,
+    `• Custo total (compras + viagem): ${brl(custoGeral)}`,
+    `• Faturamento previsto (venda): ${brl(m.totalSell)}`,
+    `• Lucro bruto (sem viagem): ${brl(m.profit)} (${m.margin.toFixed(1).replace('.', ',')}%)`,
+    `• Lucro líquido real (c/ viagem): ${brl(lucroLiquido)} (ROI ${roi.toFixed(1).replace('.', ',')}%)`,
+    ''
+  ];
+
+  const supSorted = Array.from(_idx.supplierGroups.entries())
+    .map(([sup, items]) => ({ sup, items, m: calcMetrics(items) }))
+    .sort((a, b) => b.m.totalBuy - a.m.totalBuy);
+
+  lines.push(`2. RANKING DE FORNECEDORES / LOJAS (${supSorted.length})`);
+  if (supSorted.length) {
+    supSorted.forEach((g, i) => {
+      const share = m.totalBuy > 0 ? (g.m.totalBuy / m.totalBuy) * 100 : 0;
+      lines.push(`${i + 1}. ${g.sup}: ${brl(g.m.totalBuy)} (${share.toFixed(1).replace('.', ',')}%) · ${g.m.totalQty} un. · média ${brl(g.m.avgBuy)} · lucro ${brl(g.m.profit)}`);
+    });
+  } else {
+    lines.push('Nenhum fornecedor registrado.');
+  }
+  lines.push('');
+
+  const prodSorted = _idx.productList.slice().sort((a, b) => b.buy - a.buy);
+
+  lines.push(`3. RANKING DE PEÇAS (${prodSorted.length})`);
+  if (prodSorted.length) {
+    prodSorted.forEach((pr, i) => {
+      const avg = pr.qty > 0 ? pr.buy / pr.qty : 0;
+      const mg = pr.sell > 0 ? ((pr.sell - pr.buy) / pr.sell) * 100 : 0;
+      lines.push(`${i + 1}. ${pr.name}: ${pr.qty} un. · total ${brl(pr.buy)} · média ${brl(avg)} · margem ${mg.toFixed(1).replace('.', ',')}%`);
+    });
+  } else {
+    lines.push('Nenhuma peça registrada.');
+  }
+  lines.push('');
+
+  lines.push(`4. GASTOS DE VIAGEM POR CATEGORIA (${brl(totalExpenses)})`);
+  if (_idx.expenseCategoryTotals.length) {
+    _idx.expenseCategoryTotals.forEach(([cat, val]) => {
+      const pct = totalExpenses > 0 ? (val / totalExpenses) * 100 : 0;
+      lines.push(`• ${cat}: ${brl(val)} (${pct.toFixed(1).replace('.', ',')}%)`);
+    });
+  } else {
+    lines.push('Nenhum gasto de viagem registrado.');
+  }
+
+  return lines.join('\n');
+}
+
+function copyFullReport() {
+  copyTextFallback(buildFullReportText());
+  toast('relatório completo copiado');
+}
+
+function sendFullReportWhatsApp() {
+  const txt = buildFullReportText();
+  window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank', 'noopener');
+}
+
+function openWhatsAppModal() {
+  const txt = buildFullReportText();
+  openModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h2 style="margin:0">resumo para whatsapp</h2>
+      <button class="lk" type="button" onclick="closeModal()">fechar</button>
+    </div>
+    <textarea rows="12" readonly style="font-size:13px;background:#f8fafc">${esc(txt)}</textarea>
+    <div class="row">
+      <button class="btn ghost" type="button" onclick="copyFullReport()">copiar texto</button>
+      <button class="btn ok" type="button" onclick="sendFullReportWhatsApp()">abrir whatsapp</button>
+    </div>
+  `);
+}
+
+function vRelatorios() {
+  ensureIndexes();
+  const m = _idx.allMetrics;
+  const totalExpenses = _idx.totalExpenses;
+  const custoGeral = m.totalBuy + totalExpenses;
+  const lucroLiquido = m.profit - totalExpenses;
+  const roi = custoGeral > 0 ? (lucroLiquido / custoGeral) * 100 : 0;
+
+  const supSorted = Array.from(_idx.supplierGroups.entries())
+    .map(([sup, items]) => ({ sup, items, m: calcMetrics(items) }))
+    .sort((a, b) => b.m.totalBuy - a.m.totalBuy);
+
+  const prodSorted = _idx.productList.slice().sort((a, b) => b.buy - a.buy);
+  const expSorted = _idx.expenseCategoryTotals;
+
+  $('main').innerHTML = `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px">
+        <div>
+          <h2 style="margin:0">relatório geral consolidado</h2>
+          <div style="font-size:12px;color:var(--mut)">visão organizada de compras, lojas, peças e viagem</div>
+        </div>
+        <button class="lk" type="button" onclick="openPerfModal()">⚡ desempenho</button>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button class="btn ghost" type="button" style="margin-top:0;padding:10px" onclick="copyFullReport()">copiar relatório</button>
+        <button class="btn ok" type="button" style="margin-top:0;padding:10px" onclick="sendFullReportWhatsApp()">enviar whatsapp</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn ghost" type="button" style="margin-top:0;padding:10px;font-size:14px" onclick="exportBackupFile()">💾 salvar backup</button>
+        <button class="btn ghost" type="button" style="margin-top:0;padding:10px;font-size:14px" onclick="$('backupFileInput').click()">📂 restaurar backup</button>
+      </div>
+      <button class="btn" type="button" style="margin-top:8px;padding:11px;font-size:14px" onclick="openGithubExportModal()">📦 baixar arquivos do app p/ github</button>
+      <input id="backupFileInput" type="file" accept=".json,application/json" style="display:none" onchange="importBackupFile(this)">
+    </div>
+
+    <div class="kpi">
+      <div class="card"><small>custo total (compras + viagem)</small><b>${brl(custoGeral)}</b></div>
+      <div class="card"><small>lucro líquido real</small><b style="color:${lucroLiquido >= 0 ? 'var(--ok)' : 'var(--bad)'}">${brl(lucroLiquido)}</b></div>
+      <div class="card"><small>média de preço total</small><b>${brl(m.avgBuy)}</b></div>
+      <div class="card"><small>retorno sobre custo (ROI)</small><b>${roi.toFixed(1).replace('.', ',')}%</b></div>
+    </div>
+
+    <div class="card">
+      <h2>1. resumo financeiro</h2>
+      <div class="item"><span>investimento em compras (${m.totalQty} un.)</span><b>${brl(m.totalBuy)}</b></div>
+      <div class="item"><span>gastos de viagem (${S.expenses.length} lanç.)</span><b>${brl(totalExpenses)}</b></div>
+      <div class="item"><span>faturamento previsto (venda)</span><b>${brl(m.totalSell)}</b></div>
+      <div class="item"><span>lucro bruto (sem gastos de viagem)</span><b>${brl(m.profit)} (${m.margin.toFixed(1).replace('.', ',')}%)</b></div>
+      <div class="item"><span>lucro líquido final</span><b style="color:${lucroLiquido >= 0 ? 'var(--ok)' : 'var(--bad)'}">${brl(lucroLiquido)}</b></div>
+    </div>
+
+    <div class="card">
+      <h2>2. ranking por fornecedor / loja (${supSorted.length})</h2>
+      ${supSorted.length ? supSorted.map((g, idx) => {
+        const pct = m.totalBuy > 0 ? (g.m.totalBuy / m.totalBuy) * 100 : 0;
+        return `
+          <div class="item" style="display:block">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+              <b>${idx + 1}. <strong>${esc(g.sup)}</strong></b>
+              <b>${brl(g.m.totalBuy)} (${pct.toFixed(1).replace('.', ',')}%)</b>
+            </div>
+            <small>${g.m.totalQty} un. · média ${brl(g.m.avgBuy)} · venda prev. ${brl(g.m.totalSell)} · lucro ${brl(g.m.profit)}</small>
+            <div class="bar-wrap"><div class="bar-fill" style="width:${Math.min(100, pct).toFixed(1)}%"></div></div>
+          </div>
+        `;
+      }).join('') : '<small style="color:var(--mut)">nenhuma compra registrada ainda.</small>'}
+    </div>
+
+    <div class="card">
+      <h2>3. ranking por peça (${prodSorted.length})</h2>
+      ${prodSorted.length ? prodSorted.map((pr, idx) => {
+        const avg = pr.qty > 0 ? pr.buy / pr.qty : 0;
+        const mg = pr.sell > 0 ? ((pr.sell - pr.buy) / pr.sell) * 100 : 0;
+        const pct = m.totalBuy > 0 ? (pr.buy / m.totalBuy) * 100 : 0;
+        return `
+          <div class="item" style="display:block">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+              <b>${idx + 1}. ${esc(pr.name)}</b>
+              <b>${brl(pr.buy)} (${pr.qty} un.)</b>
+            </div>
+            <small>média compra ${brl(avg)} · margem ${mg.toFixed(1).replace('.', ',')}% · ${pct.toFixed(1).replace('.', ',')}% do investimento</small>
+            <div class="bar-wrap"><div class="bar-fill ok" style="width:${Math.min(100, pct).toFixed(1)}%"></div></div>
+          </div>
+        `;
+      }).join('') : '<small style="color:var(--mut)">nenhuma peça registrada ainda.</small>'}
+    </div>
+
+    <div class="card">
+      <h2>4. gastos de viagem por categoria (${expSorted.length})</h2>
+      ${expSorted.length ? expSorted.map(([cat, val]) => {
+        const pct = totalExpenses > 0 ? (val / totalExpenses) * 100 : 0;
+        return `
+          <div class="item" style="display:block">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+              <b>${esc(cat)}</b>
+              <b>${brl(val)} (${pct.toFixed(1).replace('.', ',')}%)</b>
+            </div>
+            <div class="bar-wrap"><div class="bar-fill bad" style="width:${Math.min(100, pct).toFixed(1)}%"></div></div>
+          </div>
+        `;
+      }).join('') : '<small style="color:var(--mut)">nenhum gasto de viagem registrado ainda.</small>'}
+    </div>
+  `;
+}
+
+function buildAppDataSummaryForAI() {
+  ensureIndexes();
+  const m = _idx.allMetrics;
+  const totalExpenses = _idx.totalExpenses;
+
+  const suppliersSummary = Array.from(_idx.supplierGroups.entries()).map(([sup, items]) => {
+    const gm = calcMetrics(items);
+    const info = getSupplierInfo(sup);
+    return `- Fornecedor: ${sup} | Peças: ${gm.totalQty} un. | Total gasto: ${brl(gm.totalBuy)} | Média por peça: ${brl(gm.avgBuy)} | Venda prev.: ${brl(gm.totalSell)} | Lucro prev.: ${brl(gm.profit)} | Marcas: ${info.brands.join(', ') || 'não informada'}`;
+  }).join('\n');
+
+  const itemsSummary = S.purchases.map(p =>
+    `- ${p.date} | Fornecedor: ${capFirst(p.supplier)} | Marca: ${p.brand || '-'} | Produto: ${p.product} | Qtd: ${p.qty} | Compra: ${brl(p.buyPrice)} | Venda: ${brl(p.sellPrice)}${p.notes ? ' | Obs: ' + p.notes : ''}`
+  ).join('\n');
+
+  const expensesSummary = S.expenses.map(e =>
+    `- ${e.date} | ${e.category}: ${e.desc} = ${brl(e.amount)}`
+  ).join('\n');
+
+  return `
+RESUMO GERAL DO APP COMPRASPRO:
+- Total de peças compradas: ${m.totalQty} un.
+- Total gasto em compras: ${brl(m.totalBuy)}
+- Média de preço por peça no total: ${brl(m.avgBuy)}
+- Total previsto de venda: ${brl(m.totalSell)}
+- Lucro bruto previsto: ${brl(m.profit)} (${m.margin.toFixed(1)}%)
+- Total de gastos de viagem: ${brl(totalExpenses)}
+- Custo geral (compras + viagem): ${brl(m.totalBuy + totalExpenses)}
+- Lucro líquido real (descontando gastos de viagem): ${brl(m.profit - totalExpenses)}
+
+RESUMO POR FORNECEDOR/LOJA:
+${suppliersSummary || 'Nenhum fornecedor registrado.'}
+
+LISTA DETALHADA DE COMPRAS:
+${itemsSummary || 'Nenhuma compra registrada.'}
+
+GASTOS DE VIAGEM:
+${expensesSummary || 'Nenhum gasto registrado.'}
+  `.trim();
+}
+
+function buildOfflineAiAnswer(question) {
+  ensureIndexes();
+  const m = _idx.allMetrics;
+  const totalExpenses = _idx.totalExpenses;
+  const lucroLiquido = m.profit - totalExpenses;
+  const q = String(question || '').toLowerCase();
+
+  if (q.includes('loja') || q.includes('fornecedor')) {
+    const supSorted = Array.from(_idx.supplierGroups.entries())
+      .map(([sup, items]) => ({ sup, m: calcMetrics(items) }))
+      .sort((a, b) => b.m.totalBuy - a.m.totalBuy);
+    if (!supSorted.length) return '[Modo offline] Ainda não há fornecedores/lojas registrados.';
+    const top = supSorted.slice(0, 5).map((g, i) =>
+      `${i + 1}. ${g.sup}: ${brl(g.m.totalBuy)} (${g.m.totalQty} un. · média ${brl(g.m.avgBuy)})`
+    ).join('\n');
+    return `[Modo offline] Ranking de fornecedores/lojas por gasto:\n${top}`;
+  }
+
+  if (q.includes('margem') || q.includes('peça') || q.includes('peca') || q.includes('produto')) {
+    if (!_idx.productList.length) return '[Modo offline] Nenhuma peça registrada ainda.';
+    const byMargin = _idx.productList.slice().sort((a, b) => {
+      const ma = a.sell > 0 ? (a.sell - a.buy) / a.sell : 0;
+      const mb = b.sell > 0 ? (b.sell - b.buy) / b.sell : 0;
+      return mb - ma;
+    });
+    const top = byMargin.slice(0, 5).map((p, i) => {
+      const mg = p.sell > 0 ? ((p.sell - p.buy) / p.sell) * 100 : 0;
+      return `${i + 1}. ${p.name}: margem ${mg.toFixed(1).replace('.', ',')}% (${p.qty} un. · lucro ${brl(p.sell - p.buy)})`;
+    }).join('\n');
+    return `[Modo offline] Peças com melhor margem:\n${top}`;
+  }
+
+  return `[Modo offline] Resumo atualizado dos seus dados locais:\n` +
+    `• Peças compradas: ${m.totalQty} un.\n` +
+    `• Total em compras: ${brl(m.totalBuy)} (média ${brl(m.avgBuy)}/un.)\n` +
+    `• Gastos de viagem: ${brl(totalExpenses)}\n` +
+    `• Lucro bruto previsto: ${brl(m.profit)} (${m.margin.toFixed(1).replace('.', ',')}%)\n` +
+    `• Lucro líquido real: ${brl(lucroLiquido)}`;
+}
+
+function renderAiChatMessages() {
+  const box = $('aiChatBox');
+  if (!box) return;
+  if (!S.aiMessages.length) {
+    box.innerHTML = `<div class="msg ai">Olá! Já tenho acesso a todas as suas compras, fornecedores/lojas, marcas, peças, médias de preço e gastos de viagem. Funciona com internet (IA completa) e também offline com os seus dados locais!</div>`;
+  } else {
+    box.innerHTML = S.aiMessages.map(m =>
+      `<div class="msg ${m.role === 'user' ? 'user' : 'ai'}">${esc(m.text)}</div>`
+    ).join('');
+  }
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendAiQuestion(customText) {
+  const input = $('aiInput');
+  const q = (customText != null ? customText : (input ? input.value : '')).trim();
+  if (!q) return;
+  if (input && customText == null) input.value = '';
+
+  S.aiMessages.push({ role: 'user', text: q });
+  S.aiMessages.push({ role: 'ai', text: 'analisando seus dados...' });
+  persist();
+  renderAiChatMessages();
+
+  if (!navigator.onLine) {
+    S.aiMessages.pop();
+    S.aiMessages.push({ role: 'ai', text: buildOfflineAiAnswer(q) });
+    persist();
+    renderAiChatMessages();
+    return;
+  }
+
+  const systemPrompt = `Você é o assistente financeiro e analista de compras do aplicativo ComprasPro.
+Responda em português do Brasil de forma clara, objetiva e direta, usando exclusivamente os dados reais do aplicativo abaixo e o histórico da conversa.
+Se houver cálculos (rankings, totais, médias, margens, gastos de viagem), apresente valores exatos em R$.
+
+${buildAppDataSummaryForAI()}`;
+
+  const contents = S.aiMessages
+    .slice(0, -1)
+    .slice(-16)
+    .map(m => ({
+      role: m.role === 'user' ? 'user' : 'model',
+      parts: [{ text: m.text }]
+    }));
+
+  const apiKey = '';
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+  let answer = '';
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const resp = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents,
+          systemInstruction: { parts: [{ text: systemPrompt }] }
+        })
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      answer = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      if (answer) break;
+    } catch (err) {
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
+
+  S.aiMessages.pop();
+  S.aiMessages.push({ role: 'ai', text: answer || buildOfflineAiAnswer(q) });
+  persist();
+  renderAiChatMessages();
+}
+
+function clearAiHistory() {
+  S.aiMessages = [];
+  persist();
+  renderAiChatMessages();
+  toast('conversa limpa');
+}
+
+function vIa() {
+  $('main').innerHTML = `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div>
+          <h2 style="margin:0">✨ assistente ia · compraspro</h2>
+          <small style="color:var(--mut)">conversa contínua sobre suas compras e viagem</small>
+        </div>
+        <button class="lk bad" type="button" onclick="clearAiHistory()">limpar chat</button>
+      </div>
+
+      <div class="chip-row">
+        <button class="chip" type="button" onclick="sendAiQuestion('Quais fornecedores/lojas estão gastando mais?')">lojas que mais gastam</button>
+        <button class="chip" type="button" onclick="sendAiQuestion('Qual peça tem a melhor margem de lucro?')">melhor margem</button>
+        <button class="chip" type="button" onclick="sendAiQuestion('Qual meu lucro líquido real descontando os gastos de viagem?')">lucro líquido real</button>
+        <button class="chip" type="button" onclick="sendAiQuestion('Faça um resumo geral da viagem até agora')">resumo da viagem</button>
+      </div>
+
+      <div id="aiChatBox" class="chat-box"></div>
+
+      <form style="display:flex;gap:8px;margin-top:10px" onsubmit="event.preventDefault();sendAiQuestion()">
+        <input id="aiInput" placeholder="pergunte qualquer coisa sobre seus dados..." autocomplete="off">
+        <button class="btn" type="submit" style="width:auto;margin-top:0;padding:0 16px">enviar</button>
+      </form>
+    </div>
+  `;
+  renderAiChatMessages();
+}
+
+const VIEWS = {
+  lancamento: vLancamento,
+  pecas: vPecas,
+  compras: vCompras,
+  gastos: vGastos,
+  relatorios: vRelatorios,
+  ia: vIa
+};
+
+function syncChromeState() {
+  const nav = document.querySelector('nav');
+  if (!nav) return;
+  const btns = nav.querySelectorAll('button');
+  for (let i = 0; i < NAV_ITEMS.length && i < btns.length; i++) {
+    btns[i].classList.toggle('on', S.tab === NAV_ITEMS[i][0]);
+  }
+}
+
+function renderView() {
+  if (!VALID_TABS.includes(S.tab)) {
+    S.tab = 'lancamento';
+    persist();
+  }
+  syncChromeState();
+  const main = $('main');
+  if (!main) {
+    render();
+    return;
+  }
+  (VIEWS[S.tab] || vLancamento)();
+}
+
+function go(tab) {
+  if (!VALID_TABS.includes(tab)) tab = 'lancamento';
+  const sameTab = S.tab === tab;
+  S.tab = tab;
+  if (tab !== 'lancamento') S.editingId = null;
+  if (tab !== 'gastos') S.editingExpenseId = null;
+  persist();
+  if (!sameTab && $('main')) {
+    renderView();
+  } else {
+    render();
+  }
+}
+
+function refreshApp() {
+  try {
+    const fresh = loadState();
+    if (fresh) {
+      S.purchases = fresh.purchases;
+      S.expenses = fresh.expenses;
+      S.draft = fresh.draft;
+      S.searchCompras = fresh.searchCompras;
+      S.aiMessages = fresh.aiMessages;
+    }
+  } catch (e) {}
+  invalidateIndexes();
+  persist(true);
+  renderView();
+  toast('dados atualizados');
+}
+
+function render() {
+  if (!VALID_TABS.includes(S.tab)) {
+    S.tab = 'lancamento';
+    persist();
+  }
+
+  $('app').innerHTML = `
+    <header>
+      <h1>compraspro<small>controle de compras em viagem</small></h1>
+      <div class="hbtns">
+        <button class="rbtn" type="button" title="atualizar dados" aria-label="atualizar dados" onclick="refreshApp()">🔄</button>
+        <button class="aibtn" type="button" onclick="go('ia')">✨ ia</button>
+        <button class="wbtn" type="button" onclick="openWhatsAppModal()">whatsapp</button>
+      </div>
+    </header>
+    <main id="main"></main>
+    <nav>
+      <div>
+        ${NAV_ITEMS.map(([id, label, icon]) => `
+          <button class="${S.tab === id ? 'on' : ''}" type="button" onclick="go('${id}')">
+            <span style="font-size:17px;line-height:1">${icon}</span>
+            <span>${esc(label)}</span>
+          </button>
+        `).join('')}
+      </div>
+    </nav>
+  `;
+
+  renderView();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', render, { once: true });
+} else {
+  render();
+}
+</script>
+</body>
+</html>
